@@ -16,6 +16,7 @@ object PuzzleReceiver extends Controller {
       val sudokuModel = new SudokuModel
       sudokuModel.getMatrix(request.body)
       sudokuModel.printMatrix
+
       var previousUnfilled = 0
       var currentUnfilled = DifficultyChecker.checkDifficulty(sudokuModel)
       do {
@@ -29,7 +30,6 @@ object PuzzleReceiver extends Controller {
       sudokuModel.printPossibilitiesCount
       sudokuModel.printMatrix
 
-      Ok("Status success"
-        + sudokuModel.returnMatrix)
+      Ok(sudokuModel.returnMatrix)
   }
 }

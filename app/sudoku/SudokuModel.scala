@@ -34,7 +34,7 @@ class SudokuModel {
   }
 
   def returnMatrix: String = {
-    val matrixString = new StringBuilder("\n")
+    val matrixString = new StringBuilder
     for (i <- 0 to 8) {
       for (j <- 0 to 8) {
         matrixString.append(matrix(i)(j))
