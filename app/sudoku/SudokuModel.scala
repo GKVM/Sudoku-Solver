@@ -9,6 +9,7 @@ class SudokuModel {
   var matrix = ofDim[Int](9, 9)
   var possibilitiesMatrix = ofDim[Int](9, 9, 9)
   var possibilitiesCount = ofDim[Int](9, 9)
+  var errorLocations = ofDim[Int](9, 9)
 
   def getMatrix(matrixStream: String) {
     for (i <- 0 to 8) {
@@ -20,7 +21,7 @@ class SudokuModel {
   }
 
   def printMatrix: Unit = {
-    println("\nCurrent state of matrix:\n")
+    println("\nMatrix:")
     for (i <- 0 to 8) {
       for (j <- 0 to 8) {
         if(matrix(i)(j).equals(0)){
@@ -45,14 +46,27 @@ class SudokuModel {
   }
 
   def printPossibilitiesCount: Unit ={
-    println("\nPossibilities count:\n")
+    println("\nPossibilities count:")
     for (i <- 0 to 8) {
       for (j <- 0 to 8) {
-        if(matrix(i)(j).equals(0)){
-          print("_ ")
+        if(possibilitiesCount(i)(j).equals(0)){
+            print("_ ")
         }
         else
         print(possibilitiesCount(i)(j) + " ")
+      }
+      println
+    }
+  }
+  def printErrorLocations: Unit ={
+    println("\nError Locations:")
+    for (i <- 0 to 8) {
+      for (j <- 0 to 8) {
+        if(errorLocations(i)(j).equals(0)){
+          print("_ ")
+        }
+        else
+          print(errorLocations(i)(j) + " ")
       }
       println
     }

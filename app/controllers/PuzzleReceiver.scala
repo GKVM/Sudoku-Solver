@@ -1,7 +1,8 @@
 package controllers
 
+import checkers.MatrixVerify
 import play.api.mvc.{Action, Controller}
-import processor.{DifficultyChecker, FillAlgorithm1}
+import processor.{FillAlgorithm2, DifficultyChecker, FillAlgorithm1}
 import sudoku.SudokuModel
 
 /**
@@ -13,23 +14,37 @@ object PuzzleReceiver extends Controller {
   def puzzlePost = Action(parse.text) {
     implicit request =>
       println("Puzzle:\n" + request.body)
-      val sudokuModel = new SudokuModel
-      sudokuModel.getMatrix(request.body)
-      sudokuModel.printMatrix
+      val sudoku = new SudokuModel
+      sudoku.getMatrix(request.body)
+      sudoku.printMatrix
 
-      var previousUnfilled = 0
-      var currentUnfilled = DifficultyChecker.checkDifficulty(sudokuModel)
-      do {
-        previousUnfilled = currentUnfilled
-        FillAlgorithm1.createPossibilityMatrix(sudokuModel)
-        FillAlgorithm1.fillForSinglePossibility(sudokuModel)
-        FillAlgorithm1.clearPossibility(sudokuModel)
-        currentUnfilled = DifficultyChecker.checkDifficulty(sudokuModel)
-      } while (currentUnfilled < previousUnfilled)
-      FillAlgorithm1.createPossibilityMatrix(sudokuModel)
-      sudokuModel.printPossibilitiesCount
-      sudokuModel.printMatrix
+      if (MatrixVerify.verifyMatrix(sudoku) != 0) {
+        sudoku.printErrorLocations
+        Ok("Incorrect puzzle.")
+      }
+      else {
+        var previousUnfilled = 0
+        var currentUnfilled = DifficultyChecker.checkDifficulty(sudoku)
+        do {
+          previousUnfilled = currentUnfilled
+          FillAlgorithm1.clearPossibility(sudoku)
+          FillAlgorithm1.createPossibilityMatrix(sudoku)
+          FillAlgorithm1.fillForSinglePossibility(sudoku)
+          FillAlgorithm1.clearPossibility(sudoku)
+          FillAlgorithm2.boxPossibilityChecker(sudoku)
+          FillAlgorithm1.fillForSinglePossibility(sudoku)
+          sudoku.printMatrix
+          MatrixVerify.verifyMatrix(sudoku)
+          currentUnfilled = DifficultyChecker.checkDifficulty(sudoku)
+        } while (currentUnfilled < previousUnfilled)
+        FillAlgorithm1.createPossibilityMatrix(sudoku)
 
-      Ok(sudokuModel.returnMatrix)
+        sudoku.printPossibilitiesCount
+        sudoku.printMatrix
+        if (MatrixVerify.verifyMatrix(sudoku) != 0) {
+          sudoku.printErrorLocations
+        }
+        Ok(sudoku.returnMatrix)
+      }
   }
 }
